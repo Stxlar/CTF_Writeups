@@ -1,111 +1,148 @@
-📝 Walkthrough – PicoCTF: Hash Crack
-First, connect to the challenge server:
+# 📝 Walkthrough – PicoCTF: Hash Crack
 
-bash
-Copy
-Edit
+## 🔌 Step 1 – Connect to the Server
+
+Run this command to start the challenge:
+
+```bash
 nc verbal-sleep.picoctf.net 52014
-They give you the first hash.
-A hash is the result of a string or data being processed by a one-way hash function (like MD5 or SHA-1). These functions are used for verifying data integrity or storing passwords securely (well, they used to be 😅).
+```
 
-Here’s the first hash:
+---
 
-Copy
-Edit
+## 🧠 What's a Hash?
+
+They first give you this hash:
+
+```
 482c811da5d5b4bc6d497ffa98491e38
-🔍 Step 1 – Identify the Hash Type
-There are many hashing algorithms. To identify which one was used, we count how many bits the hash consists of.
-Here’s a quick way to do that in Python:
+```
 
-python
-Copy
-Edit
+A hash is the result of a string or data being processed by a one-way hash function (like **MD5** or **SHA1**). These functions are commonly used for verifying data integrity or storing passwords securely (well, they used to be... 😅).
+
+---
+
+## 🔍 Step 2 – Identify the Hash Type
+
+There are different hashing algorithms, and each produces a hash of a specific length (in bits). To identify the hash type, you can count the bit length using Python:
+
+```python
 hex = "482c811da5d5b4bc6d497ffa98491e38"
 print(int(hex, 16).bit_length())
+```
+
 Output:
 
-Copy
-Edit
+```
 127
-Even though it says 127, it’s actually a 128-bit hash. That’s because .bit_length() excludes leading 0s, and this hash starts with 4, which is 0100 in binary.
+```
 
-Looking up "hash algorithms that generate 128-bit", the most well-known is MD5 — which was broken over 20 years ago.
+Even though it says **127**, it's actually **128 bits**. That’s because `.bit_length()` excludes leading zeroes. Since the hash starts with `4` (which is `0100` in binary), one bit is dropped in the count.
 
-We use an MD5 online lookup tool, input the hash, and get:
+If you search for "hash algorithms that generate 128-bit hashes", you’ll find that **MD5** is the most common one — though it's been broken for over 20 years.
 
-nginx
-Copy
-Edit
+Use an MD5 decryption tool (just search on google the following: MD5 decrypt) and input the hash. You’ll get:
+
+```
 password123
-🔍 Step 2 – Crack the SHA-1 Hash
-Next, they give us:
+```
 
-nginx
-Copy
-Edit
+---
+
+## 🔐 Step 3 – Crack the SHA-1 Hash
+
+Next, they give you:
+
+```
 b7a875fc1ea228b9061041b7cec4bd3c52ab3ce3
-Bit length: 160
-This corresponds to SHA-1. Same deal — use an online SHA-1 lookup tool:
+```
 
-nginx
-Copy
-Edit
+This is a **160-bit** hash → **SHA-1**.
+
+Use an online SHA-1 decrypter. The result:
+
+```
 letmein
-🔍 Step 3 – Crack the SHA-256 Hash
+```
+
+---
+
+## 🔐 Step 4 – Crack the SHA-256 Hash
+
 Final hash:
 
-Copy
-Edit
+```
 916e8c4f79b25028c9e467f1eb8eee6d6bbdff965f9928310ad30a8d88697745
-Bit length: 256
-This is SHA-256. Use a SHA-256 hash cracker or a script to brute-force:
+```
 
-nginx
-Copy
-Edit
+This is **256 bits**, which means it’s **SHA-256**.
+
+Use a SHA-256 cracker (online or script-based). The result:
+
+```
 qwerty098
-🎉 Final Step
-After entering the 3 cracked passwords, the challenge gives us the flag:
+```
 
-Copy
-Edit
-picoCTF{...} ✅
-🔐 Hash Length Cheat Sheet
-Hash Type	Length (hex)	Bits	Example
-MD5	32	128	482c811da5...
-SHA-1	40	160	b7a875fc1e...
-SHA-256	64	256	916e8c4f79...
+---
 
-💡 Tip: Build Your Own Tools
-Online hash lookup tools are useful, but for real challenges or automation, write your own scripts.
+## 🏁 Final Step – Get the Flag
 
-Here are two tools I built for this challenge:
+After entering all 3 cracked passwords, the challenge gives you the flag:
 
-🛠️ SHA-1 Cracker (using rockyou.txt)
-python
-Copy
-Edit
+```
+picoCTF{...}
+```
+
+---
+
+## 📊 Hash Length Cheat Sheet
+
+| Hash Type | Length (hex) | Bits | Example                    |
+|-----------|---------------|------|----------------------------|
+| MD5       | 32            | 128  | `482c811da5...`            |
+| SHA-1     | 40            | 160  | `b7a875fc1e...`            |
+| SHA-256   | 64            | 256  | `916e8c4f79...`            |
+
+---
+
+## 💡 Tip: Write Your Own Tools
+
+Even though online tools are great, it’s better to script your own tools in Python (or whatever language you're comfortable with). Here's what I personally wrote/used:
+
+---
+
+### 🛠️ SHA-1 Cracker (with rockyou.txt)
+
+```python
 import hashlib
 
-target = ""  # Enter your SHA-1 hash
+target = ""  # Enter your SHA-1 hash here
 
 with open("rockyou.txt", "r", encoding="latin-1") as file:
     for word in file:
         word = word.strip()
         if hashlib.sha1(word.encode()).hexdigest() == target:
-            print(f"[+] The password is: {word}")
+            print(f"[+] The password is : {word}")
             break
-🛠️ SHA-256 Cracker (using rockyou.txt)
-python
-Copy
-Edit
+```
+
+---
+
+### 🛠️ SHA-256 Cracker (with rockyou.txt)
+
+```python
 import hashlib
 
-target = ""  # Enter your SHA-256 hash
+target = ""  # Enter your SHA-256 hash here
 
 with open("rockyou.txt", "r", encoding="latin-1") as file:
     for word in file:
         word = word.strip()
         if hashlib.sha256(word.encode()).hexdigest() == target:
-            print(f"[+] The password is: {word}")
+            print(f"[+] The password is : {word}")
             break
+```
+
+---
+
+✍️ Written by [Stxlar](https://github.com/Stxlar)
